@@ -1,5 +1,28 @@
+set -eu
+
+# Check for required commands
+if [ $# -lt 2 ]; then
+  echo "Usage: rag.sh <path-to-docs> <question> [<top-k>]"
+  exit 1
+fi
+
+# create venv once, then reuse it
+if [ ! -d "venv" ]; then
+    echo "----------------------------"
+    echo "Creating virtual environment..."
+    echo " "
+  python3 -m venv venv
+fi
+
+echo "----------------------------"
+echo "Activating virtual environment and installing dependencies."
+echo " "
+. venv/bin/activate
+pip install --upgrade pip
 pip install -q docling scikit-learn
 echo " "
+
+
 echo "----------------------------"
 echo "Docling documentation to markdown (tmp/md) and extract context (tmp/ctx) for question:"
 echo " "
