@@ -1,0 +1,1 @@
+brew install ollama && ollama serve & sleep 3; ollama pull qwen2.5:7b
