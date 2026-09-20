@@ -1,7 +1,7 @@
 # mini-RAG
 
-Ask questions about your documents in under 20 lines of shell.
-
+Ask questions about your documents with mini-RAG.
+Built in about 20 lines of shell on top of this open source stack:
 **Stack:** [Docling](https://github.com/docling-project/docling) (parsing) → TF-IDF (retrieval) → [Ollama](https://ollama.com) (local LLM)
 
 ```
