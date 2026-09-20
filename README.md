@@ -1,25 +1,72 @@
 # mini-RAG
 
-Ask questions about your documents using Docling, TF-IDF retrieval and a local LLM via Ollama.
+Ask questions about your documents in under 20 lines of shell.
+
+**Stack:** [Docling](https://github.com/docling-project/docling) (parsing) → TF-IDF (retrieval) → [Ollama](https://ollama.com) (local LLM)
+
+```
+docs/ ──docling──▶ tmp/md/*.md ──TF-IDF top-k──▶ tmp/ctx ──Ollama──▶ answer
+```
 
 ## Requirements
-- Python 3, `jq`, Homebrew (`brew install jq`)
 
-## 1. Start the LLM server (terminal 1)
+- macOS or Linux with [Homebrew](https://brew.sh)
+- Python 3
+- `jq`: `brew install jq`
+
+## Quick start
+
+**1. Start the LLM server** (terminal 1). Skip this if the Ollama app is already running.
+
 ```bash
 sh server.sh
 ```
-Skip this if the Ollama app is already running.
 
-## 2. Chat with your docs (terminal 2)
+**2. Ask a question** (terminal 2)
+
 ```bash
-sh rag.sh ./docs "What is missingness?" 8  # top 8 chunks (default value is 4)
-
-# RAG Answer
-Missingness refers to the absence of data for certain variables in a dataset. This can occur for various reasons and can be categorized into different types, such as missing completely at random (MCAR), missing at random (MAR), or missing not at random (MNAR). Understanding the type of missingness is crucial because it influences how the data should be handled. For instance, the handling of missing data in response variables versus predictor variables can differ, and the nature of the variable (quantitative or categorical) and the extent of missingness also play significant roles in determining the appropriate methods for addressing missing data.
+sh rag.sh ./docs "What are geospatial foundation models?"
 ```
 
-> ⚠️ **First launch is slow.** 
+## Usage
 
-> Dependencies are installed, Docling downloads its
-> models, and Ollama pulls the LLM (~4.7 GB for `qwen2.5:7b`).
+```bash
+sh rag.sh <docs_path> "<question>" [top_k] [model] [ollama_url]
+```
+
+Arguments are **positional** (there are no `--flags`), so they must be given in this order:
+
+| Position | Argument     | Description                      | Default                                   |
+|----------|--------------|----------------------------------|-------------------------------------------|
+| 1        | `docs_path`  | File or folder of documents      | required                                  |
+| 2        | `question`   | Your question, in quotes         | required                                  |
+| 3        | `top_k`      | Number of chunks sent to the LLM | `4`                                       |
+| 4        | `model`      | Ollama model name                | `$MODEL` or `qwen2.5:7b`                  |
+| 5        | `ollama_url` | Ollama server address            | `$OLLAMA_URL` or `http://localhost:11434` |
+
+Example with 8 chunks:
+
+```bash
+sh rag.sh ./docs "What are geospatial foundation models?" 8
+```
+
+**Environment variables** (optional):
+
+```bash
+MODEL=llama3.1:8b sh rag.sh ./docs "Question?"      # use another model
+OLLAMA_URL=http://gpu-box:11434 sh rag.sh ...       # remote Ollama server
+```
+
+## Debugging
+
+Intermediate files are saved in `./tmp/`:
+
+| File        | Content                                              |
+|-------------|------------------------------------------------------|
+| `tmp/md/`   | Markdown produced by Docling, one file per document  |
+| `tmp/ctx`   | The retrieved chunks sent to the LLM (last run only) |
+
+If an answer looks wrong, run `cat tmp/ctx` to check whether the right chunks were retrieved. To force a clean re-parse, run `rm -rf tmp/md`.
+
+> ⚠️ **The first launch is slow.** Dependencies are installed, Docling downloads
+> its models, and Ollama pulls the LLM (~4.7 GB for `qwen2.5:7b`).
