@@ -38,4 +38,8 @@ echo " "
 echo "----------------------------"
 echo "Ollama Answer based on context:"
 echo " "
-curl -s "${OLLAMA_URL:-http://localhost:11434}/api/chat" -d "$(jq -n --arg m "${MODEL:-qwen2.5:7b}" --arg q "$2" --rawfile c tmp/ctx '{model:$m,stream:false,messages:[{role:"user",content:("Answer only from this context:\n"+$c+"\nQ: "+$q)}]}')" | jq -r '.message.content'
+curl -sN "${OLLAMA_URL:-http://localhost:11434}/api/chat" \
+  -d "$(jq -n --arg m "${MODEL:-qwen2.5:7b}" --arg q "$2" --rawfile c tmp/ctx \
+    '{model:$m,stream:true,messages:[{role:"user",content:("Answer only from this context:\n"+$c+"\nQ: "+$q)}]}')" \
+  | jq --unbuffered -rj '.message.content // empty'
+echo
