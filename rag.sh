@@ -56,7 +56,7 @@ mkdir -p "$NAME_TMP_DIR"
 docling "$1" --to md --output "$NAME_TMP_DIR" --device auto --show-layout --image-export-mode referenced
 echo " "
 echo "----------------------------"
-echo "TF-IDF sparse embedding and retrieval of top ${3:-4} context paragraphs for question:"
+echo "TF-IDF sparse embedding and retrieval of top ${3:-4} context paragraphs save to $NAME_TMP_DIR/ctx."s
 echo " "
 python3 - "$2" "${3:-4}" "$NAME_TMP_DIR" <<'EOF' > "$NAME_TMP_DIR/ctx"
 import sys,glob
