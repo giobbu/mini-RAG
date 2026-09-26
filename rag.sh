@@ -15,6 +15,19 @@ if [ ! -d "venv" ]; then
 fi
 
 echo "----------------------------"
+echo "Detecting GPU mode..."
+if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi -L >/dev/null 2>&1; then
+  GPU_MODE=cuda
+  echo "CUDA GPU detected."
+elif python3 -c "import torch; exit(0 if torch.backends.mps.is_available() else 1)" 2>/dev/null; then
+  GPU_MODE=mps
+  echo "Apple MPS GPU detected."
+else
+  GPU_MODE=cpu
+  echo "No GPU detected. Using CPU mode."
+fi
+
+echo "----------------------------"
 echo "Activating virtual environment and installing dependencies."
 echo " "
 . venv/bin/activate
@@ -22,11 +35,29 @@ pip install --upgrade pip
 pip install -q docling scikit-learn
 echo " "
 
+if [ "$GPU_MODE" = "cuda" ]; then
+  echo "Ensuring CUDA-enabled torch is installed..."
+  pip install -q torch --index-url https://download.pytorch.org/whl/cu121
+else
+  echo "No NVIDIA GPU: using default torch (CPU or Apple MPS)."
+  pip install -q torch
+fi
+echo " "
+
 
 echo "----------------------------"
 echo "Docling documentation to markdown (tmp/md) and extract context (tmp/ctx) for question:"
 echo " "
-mkdir -p tmp && docling "$1" --to md --output tmp/md
+mkdir -p tmp
+
+if [ "$GPU_MODE" = "cuda" ]; then
+  docling "$1" --to md --output tmp/md --device cuda
+elif [ "$GPU_MODE" = "mps" ]; then
+  docling "$1" --to md --output tmp/md --device mps
+else
+  docling "$1" --to md --output tmp/md --device cpu
+fi
+
 python3 - "$2" "${3:-4}" <<'EOF' > tmp/ctx
 import sys,glob
 from sklearn.feature_extraction.text import TfidfVectorizer as T
