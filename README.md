@@ -5,7 +5,7 @@ Built in few lines of shell on top of this open source stack:
 **Stack:** [Docling](https://github.com/docling-project/docling) (parsing) → TF-IDF (retrieval) → [Ollama](https://ollama.com) (local LLM)
 
 ```
-docs/ ──docling──▶ tmp/md/*.md ──TF-IDF top-k──▶ tmp/ctx ──Ollama──▶ answer
+docs/ ──docling──▶ tmp/*.md ──TF-IDF top-k──▶ tmp/ctx ──Ollama──▶ answer
 ```
 
 ## Requirements
@@ -63,7 +63,7 @@ Intermediate files are saved in `./tmp/`:
 
 | File        | Content                                              |
 |-------------|------------------------------------------------------|
-| `tmp/md/`   | Markdown produced by Docling, one file per document  |
+| `tmp/`      | Markdown produced by Docling, one file per document  |
 | `tmp/ctx`   | The retrieved chunks sent to the LLM (last run only) |
 
 If an answer looks wrong, run `cat tmp/ctx` to check whether the right chunks were retrieved. To force a clean re-parse, run `rm -rf tmp/md`.
