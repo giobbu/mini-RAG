@@ -55,7 +55,7 @@ if [ "$GPU_MODE" = "cuda" ]; then
 elif [ "$GPU_MODE" = "mps" ]; then
   docling "$1" --to md --output tmp/md --device mps
 else
-  docling "$1" --to md --output tmp/md --device cpu
+  docling "$1" --to md --output tmp/md --device auto
 fi
 
 python3 - "$2" "${3:-4}" <<'EOF' > tmp/ctx
