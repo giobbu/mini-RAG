@@ -63,10 +63,10 @@ Intermediate files are saved in `./tmp/`:
 
 | File        | Content                                              |
 |-------------|------------------------------------------------------|
-| `tmp/`      | Markdown produced by Docling, one file per document  |
+| `tmp/*.md`  | Markdown produced by Docling, one file per document  |
 | `tmp/ctx`   | The retrieved chunks sent to the LLM (last run only) |
 
-If an answer looks wrong, run `cat tmp/ctx` to check whether the right chunks were retrieved. To force a clean re-parse, run `rm -rf tmp/md`.
+If an answer looks wrong, run `cat tmp/ctx` to check whether the right chunks were retrieved. To force a clean re-parse, run `rm -rf tmp`.
 
 > ⚠️ **The first launch is slow.** Dependencies are installed, Docling downloads
 > its models, and Ollama pulls the LLM (~4.7 GB for `qwen2.5:7b`).
